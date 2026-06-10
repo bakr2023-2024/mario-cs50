@@ -8,7 +8,6 @@ function PlayState:init()
 	self.tileMap = self.level.tileMap
 	self.background = math.random(3)
 	self.backgroundX = 0
-
 	self.gravityOn = true
 	self.gravityAmount = 900
 	local startX = 0
@@ -41,24 +40,16 @@ function PlayState:init()
 		map = self.tileMap,
 		level = self.level,
 	})
-
 	self:spawnEnemies()
-
 	self.player:changeState("falling")
 end
 
 function PlayState:update(dt)
 	self.timer.update(dt)
-
-	-- remove any nils from pickups, etc.
 	self.level:clear()
-
-	-- update player and level
 	self.player:update(dt)
 	self.level:update(dt)
 	self:updateCamera()
-
-	-- constrain player X no matter which state
 	if self.player.x <= 0 then
 		self.player.x = 0
 	elseif self.player.x > TILE_SIZE * self.tileMap.width - self.player.width then
@@ -98,16 +89,10 @@ function PlayState:render()
 		1,
 		-1
 	)
-
-	-- translate the entire view of the scene to emulate a camera
 	love.graphics.translate(-math.floor(self.camX), -math.floor(self.camY))
-
 	self.level:render()
-
 	self.player:render()
 	love.graphics.pop()
-
-	-- render score
 	love.graphics.setFont(fonts["medium"])
 	love.graphics.setColor(0, 0, 0, 1)
 	love.graphics.print(tostring(self.player.score), 5, 5)
@@ -116,31 +101,20 @@ function PlayState:render()
 end
 
 function PlayState:updateCamera()
-	-- clamp movement of the camera's X between 0 and the map bounds - virtual width,
-	-- setting it half the screen to the left of the player so they are in the center
 	self.camX = math.max(0, math.min(TILE_SIZE * self.tileMap.width - VW, self.player.x - (VW2 - 8)))
-
-	-- adjust background X to move a third the rate of the camera for parallax
 	self.backgroundX = (self.camX / 3) % 256
 end
 
---[[
-    Adds a series of enemies to the level randomly.
-]]
-function PlayState:spawnEnemies()
-	-- spawn snails in the level
-	for x = 1, self.tileMap.width do
-		-- flag for whether there's ground on this column of the level
-		local groundFound = false
 
+function PlayState:spawnEnemies()
+	for x = 1, self.tileMap.width do
+		local groundFound = false
 		for y = 1, self.tileMap.height do
 			if not groundFound then
 				if self.tileMap.tiles[y][x].id == TILE_ID_GROUND then
 					groundFound = true
 
-					-- random chance, 1 in 20
 					if math.random(20) == 1 then
-						-- instantiate snail, declaring in advance so we can pass it into state machine
 						local snail
 						snail = Snail({
 							texture = "creatures",
