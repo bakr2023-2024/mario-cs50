@@ -1,0 +1,85 @@
+WW = 1280
+WH = 720
+VW = 256
+VH = 144
+VW2 = VW / 2
+VH2 = VH / 2
+
+TILE_SIZE = 16
+
+TILE_SET_WIDTH = 5
+TILE_SET_HEIGHT = 4
+
+TILE_SETS_WIDE = 6
+TILE_SETS_TALL = 10
+
+TOPPER_SETS_WIDE = 6
+TOPPER_SETS_TALL = 18
+
+CHARACTER_WIDTH = 16
+CHARACTER_HEIGHT = 20
+
+CAMERA_SPEED = 100
+BACKGROUND_SCROLL_SPEED = 10
+
+GRAVITY = 980
+
+PLAYER_WALK_SPEED = 60
+
+PLAYER_JUMP_VELOCITY = -300
+
+SNAIL_MOVE_SPEED = 10
+
+TILE_ID_EMPTY = 5
+TILE_ID_GROUND = 3
+
+COLLIDABLE_TILES = {
+	TILE_ID_GROUND,
+}
+
+BUSH_IDS = {
+	1,
+	2,
+	5,
+	6,
+	7,
+}
+
+COIN_IDS = {
+	1,
+	2,
+	3,
+}
+
+CRATES = {
+	1,
+	2,
+	3,
+	4,
+	5,
+	6,
+	7,
+	8,
+	9,
+	10,
+	11,
+	12,
+}
+SNAIL_SCORE = 100
+GEM_SCORE = 100
+GEMS = {
+	1,
+	2,
+	3,
+	4,
+	5,
+	6,
+	7,
+	8,
+}
+
+JUMP_BLOCKS = {}
+
+for i = 1, 30 do
+	table.insert(JUMP_BLOCKS, i)
+end
