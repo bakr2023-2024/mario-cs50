@@ -39,6 +39,11 @@ function PlayerWalkingState:update(dt)
 			self.player.direction = "right"
 			self.player:checkRightCollisions(dt)
 		end
+		
+		local ladder = self.player:checkLadderOverlapping()
+		if ladder and love.keyboard.active["up"] then
+			self.player:changeState("climbing")
+		end
 	end
 
 	for i, entity in ipairs(self.player.level.entities) do

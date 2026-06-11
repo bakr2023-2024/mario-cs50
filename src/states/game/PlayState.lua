@@ -43,6 +43,9 @@ function PlayState:enter(params)
 			["falling"] = function()
 				return PlayerFallingState(self.player, self.gravityAmount)
 			end,
+			['climbing'] = function()
+				return PlayerLadderClimbingState(self.player)
+			end
 		}),
 		map = self.tileMap,
 		level = self.level,

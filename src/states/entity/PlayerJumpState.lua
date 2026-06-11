@@ -75,4 +75,9 @@ function PlayerJumpState:update(dt)
 			gsm:change("start")
 		end
 	end
+
+	local ladder = self.player:checkLadderOverlapping()
+	if ladder and love.keyboard.active["up"] then
+		self.player:changeState("climbing")
+	end
 end

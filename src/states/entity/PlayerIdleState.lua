@@ -10,6 +10,11 @@ function PlayerIdleState:init(player)
 end
 
 function PlayerIdleState:update(dt)
+	local ladder = self.player:checkLadderOverlapping()
+	if ladder and love.keyboard.active["up"] then
+		self.player:changeState("climbing")
+	end
+
 	if love.keyboard.isDown("left") or love.keyboard.isDown("right") then
 		self.player:changeState("walking")
 	end

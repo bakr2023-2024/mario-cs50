@@ -50,3 +50,21 @@ function Player:checkObjectCollisions()
 	end
 	return collided
 end
+
+function Player:checkLadderOverlapping()
+	local playerLeft, playerRight = self.x + 3, self.x + self.width - 3
+	local playerDown = self.y + self.height
+	for i, object in ipairs(self.level.objects) do
+		if object.texture == "ladders_and_signs" then
+			if
+				playerLeft >= object.x
+				and playerRight <= object.x + object.width
+				and playerDown >= object.y
+				and playerDown <= object.y + object.height
+			then
+				return object
+			end
+		end
+	end
+	return nil
+end

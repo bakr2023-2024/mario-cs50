@@ -8,9 +8,10 @@ function LevelMaker.generate(width, height)
 	local tileSet, topperSet = rand(#frames["tileSets"]), rand(#frames["topperSets"])
 	-- key spaws at random X location and lock spawns after it
 	local keySpawnX = rand(30, width - 30)
-	local lockSpawnX = keySpawnX + 10
+	local lockSpawnX = keySpawnX - 10
 	local keyColor = rand(4)
 	local keyFound = false
+	local lastPillerX = 1
 	for y = 1, height do
 		table.insert(tiles, {})
 		for x = 1, width do
@@ -22,10 +23,13 @@ function LevelMaker.generate(width, height)
 			for y = 7, height do
 				tiles[y][x] = Tile(x, y, TILE_ID_GROUND, y == 7, tileSet, topperSet)
 			end
-		elseif rand(20) == 1 and x > 2 and x < width - 2 then
-			for nx = x - 1, x + 1 do
-				for y = nx == x and 3 or 7, height do
-					tiles[y][x] = Tile(x, y, TILE_ID_GROUND, y == 3, tileSet, topperSet)
+		elseif rand(25) == 1 and x > lastPillerX + 1 and x < width-2 then
+			if x - 1 ~= lockSpawnX and x ~= lockSpawnX and x + 1 ~= lockSpawnX then
+				lastPillerX = x
+				for nx = x - 1, x + 1 do
+					for y = (nx == x and 3 or 7), height do
+						tiles[y][nx] = Tile(nx, y, TILE_ID_GROUND, y == (nx == x and 3 or 7), tileSet, topperSet)
+					end
 				end
 			end
 			createLadders(objects, x, 3)
@@ -34,7 +38,8 @@ function LevelMaker.generate(width, height)
 			for y = 7, height do
 				tiles[y][x] = Tile(x, y, TILE_ID_GROUND, y == 7, tileSet, topperSet)
 			end
-			if rand(8) == 1 then
+			if rand(8) == 1 and (x > lastPillerX + 1 or x < lastPillerX - 1) and x ~= lockSpawnX then
+				lastPillerX = x
 				blockHeight = 2
 				if rand(8) == 1 then
 					objects[#objects + 1] = GameObject({
@@ -104,7 +109,7 @@ function LevelMaker.generate(width, height)
 					end,
 				})
 				table.insert(objects, lock)
-			elseif rand(20) == 1 then
+			elseif rand(15) == 1 and (x < lastPillerX - 1 or x > lastPillerX + 1) then
 				objects[#objects + 1] = GameObject({
 					texture = "jump-blocks",
 					x = (x - 1) * TILE_SIZE,
