@@ -23,22 +23,27 @@ function LevelMaker.generate(width, height)
 			for y = 7, height do
 				tiles[y][x] = Tile(x, y, TILE_ID_GROUND, y == 7, tileSet, topperSet)
 			end
-		elseif rand(25) == 1 and x > lastPillerX + 1 and x < width-2 then
-			if x - 1 ~= lockSpawnX and x ~= lockSpawnX and x + 1 ~= lockSpawnX then
-				lastPillerX = x
-				for nx = x - 1, x + 1 do
-					for y = (nx == x and 3 or 7), height do
-						tiles[y][nx] = Tile(nx, y, TILE_ID_GROUND, y == (nx == x and 3 or 7), tileSet, topperSet)
-					end
+		elseif rand(7) == 1 and x ~= lockSpawnX and x~= keySpawnX and x > lastPillerX + 1 then
+			for y = 1, height do
+				tiles[y][x] = Tile(x, y, TILE_ID_EMPTY, y == 7, tileSet, topperSet)
+			end
+		-- randomly spawn tall pillars with ladder at each side and make sure it doesn't overlap with existing pillars 
+		-- make sure pillar doesn't overlap with lock block or key
+		elseif rand(25) == 1 and x > lastPillerX + 1 and x < width-2 and x ~= lockSpawnX and x ~= keySpawnX then
+			lastPillerX = x
+			for nx = x - 1, x + 1 do
+				for y = (nx == x and 3 or 7), height do
+					tiles[y][nx] = Tile(nx, y, TILE_ID_GROUND, y == (nx == x and 3 or 7), tileSet, topperSet)
 				end
 			end
+			-- create the ladders based on pillar position
 			createLadders(objects, x, 3)
-		elseif rand(7) ~= 1 then
+		else
 			local blockHeight = 4
 			for y = 7, height do
 				tiles[y][x] = Tile(x, y, TILE_ID_GROUND, y == 7, tileSet, topperSet)
 			end
-			if rand(8) == 1 and (x > lastPillerX + 1 or x < lastPillerX - 1) and x ~= lockSpawnX then
+			if rand(8) == 1 and x > lastPillerX + 1 then
 				lastPillerX = x
 				blockHeight = 2
 				if rand(8) == 1 then
@@ -109,7 +114,7 @@ function LevelMaker.generate(width, height)
 					end,
 				})
 				table.insert(objects, lock)
-			elseif rand(15) == 1 and (x < lastPillerX - 1 or x > lastPillerX + 1) then
+			elseif rand(10) == 1 and x > lastPillerX + 1 then
 				objects[#objects + 1] = GameObject({
 					texture = "jump-blocks",
 					x = (x - 1) * TILE_SIZE,
@@ -122,7 +127,7 @@ function LevelMaker.generate(width, height)
 					solid = true,
 					onCollide = function(obj)
 						if not obj.hit then
-							if rand(5) == 1 then
+							if rand(4) == 1 then
 								local gem = GameObject({
 									texture = "gems",
 									x = (x - 1) * TILE_SIZE,
@@ -141,6 +146,32 @@ function LevelMaker.generate(width, height)
 									[gem] = { y = (blockHeight - 2) * TILE_SIZE },
 								})
 								objects[#objects + 1] = gem
+							-- lower chance to spawn powerup
+							elseif rand(8) == 1 then
+								local powerup = GameObject({
+									texture = "mushrooms",
+									x = (x - 1) * TILE_SIZE,
+									y = (blockHeight - 1) * TILE_SIZE - 4,
+									width = 16,
+									height = 16,
+									frame = rand(8) * 5 + 3,
+									collidable = true,
+									consumable = true,
+									solid = false,
+									onConsume = function(player, object)
+										-- set invincible to true and set it back to false after 10 seconds (effect doesn't stack)
+										if not player.invincible then
+											player.invincible = true
+											timer.after(10, function()
+												player.invincible = false
+											end)
+										end
+									end,
+								})
+								timer.tween(0.1, {
+									[powerup] = { y = (blockHeight - 2) * TILE_SIZE },
+								})
+								objects[#objects + 1] = powerup
 							end
 							obj.hit = true
 						end
@@ -155,7 +186,7 @@ function createLadders(objects, x, y)
 	for ny = y, y + 3 do
 		-- left of pillar
 		objects[#objects + 1] = GameObject({
-			texture = "ladders_and_signs",
+			texture = "ladders",
 			frame = ny == y and 1 or 8, -- upper or lower part of ladder
 			x = ((x - 1) - 1) * TILE_SIZE,
 			y = (ny - 1) * TILE_SIZE,
@@ -167,7 +198,7 @@ function createLadders(objects, x, y)
 		})
 		-- right of pillar
 		objects[#objects + 1] = GameObject({
-			texture = "ladders_and_signs",
+			texture = "ladders",
 			frame = ny == y and 1 or 8, -- upper or lower part of ladder
 			x = ((x - 1) + 1) * TILE_SIZE,
 			y = (ny - 1) * TILE_SIZE,

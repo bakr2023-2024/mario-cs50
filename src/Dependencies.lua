@@ -52,7 +52,9 @@ textures = {
 	["creatures"] = love.graphics.newImage("graphics/creatures.png"),
 	['keys_and_locks'] = love.graphics.newImage("graphics/keys_and_locks.png"),
 	['flags'] = love.graphics.newImage('graphics/flags.png'),
-	['ladders_and_signs'] = love.graphics.newImage('graphics/ladders_and_signs.png')
+	['ladders'] = love.graphics.newImage('graphics/ladders_and_signs.png'),
+	['mushrooms'] =love.graphics.newImage('graphics/mushrooms.png'),
+	['particle'] =love.graphics.newImage('graphics/particle.png')
 }
 
 frames = {
@@ -66,7 +68,8 @@ frames = {
 	["creatures"] = GenerateQuads(textures["creatures"], 16, 16),
 	['keys_and_locks'] = GenerateQuads(textures['keys_and_locks'],16,16),
 	['flags'] = GenerateQuads(textures['flags'],16,16),
-	['ladders_and_signs'] = GenerateQuads(textures['ladders_and_signs'],16,16)
+	['ladders'] = GenerateQuads(textures['ladders'],16,16),
+	['mushrooms'] = GenerateQuads(textures['mushrooms'],16,16)
 }
 frames["tileSets"] =
 	GenerateTileSetsQuads(frames["tiles"], TILE_SETS_WIDE, TILE_SETS_TALL, TILE_SET_WIDTH, TILE_SET_HEIGHT)

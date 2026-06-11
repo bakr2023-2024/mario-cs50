@@ -69,13 +69,20 @@ function PlayerJumpState:update(dt)
 			table.remove(self.player.level.objects, i)
 		end
 	end
-
-	for i, entity in ipairs(self.player.level.entities) do
+	local entities = self.player.level.entities
+	for i = #entities, 1, -1 do
+		local entity = entities[i]
 		if entity:collides(self.player) then
-			gsm:change("start")
+			-- if player is invincible, destroy enemy and increase player's score else go back to start
+			if self.player.invincible then
+				self.player.score = self.player.score + SNAIL_SCORE
+				table.remove(self.player.level.entities, i)
+			else
+				gsm:change("start")
+			end
 		end
 	end
-
+	-- check if a ladder exists and up key is pressed to transition to ladder climbing state
 	local ladder = self.player:checkLadderOverlapping()
 	if ladder and love.keyboard.active["up"] then
 		self.player:changeState("climbing")
