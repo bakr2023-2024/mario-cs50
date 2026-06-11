@@ -30,9 +30,12 @@ function PlayerIdleState:update(dt)
 		if entity:collides(self.player) then
 			-- if player is invincible, destroy enemy and increase player's score else go back to start
 			if self.player.invincible then
+				sounds["kill"]:play()
+				sounds["kill2"]:play()
 				self.player.score = self.player.score + SNAIL_SCORE
 				table.remove(self.player.level.entities, i)
 			else
+				sounds["death"]:play()
 				gsm:change("start")
 			end
 		end

@@ -27,6 +27,7 @@ function PlayerFallingState:update(dt)
 		end
 		self.player.y = (bottomLeft.y - 1) * TILE_SIZE - self.player.height
 	elseif self.player.y > VH then
+		sounds["death"]:play()
 		gsm:change("start")
 	elseif love.keyboard.isDown("left") then
 		self.player.direction = "left"
@@ -59,6 +60,8 @@ function PlayerFallingState:update(dt)
 	for i = #entities, 1, -1 do
 		local entity = entities[i]
 		if entity:collides(self.player) then
+			sounds["kill"]:play()
+			sounds["kill2"]:play()
 			self.player.score = self.player.score + SNAIL_SCORE
 			table.remove(self.player.level.entities, i)
 		end

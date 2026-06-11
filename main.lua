@@ -12,6 +12,11 @@ function love.load()
 		end,
 	})
 	gsm:change("start")
+
+	sounds["music"]:setLooping(true)
+	sounds["music"]:setVolume(0.5)
+	sounds["music"]:play()
+
 	love.window.setMode(WW, WH, { fullscreen = false, vsync = true, resizable = true })
 	push:setupScreen(VW, VH, WW, WH, { fullscreen = false, resizable = true })
 

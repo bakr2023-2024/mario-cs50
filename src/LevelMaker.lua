@@ -7,11 +7,12 @@ function LevelMaker.generate(width, height)
 	local entities = {}
 	local tileSet, topperSet = rand(#frames["tileSets"]), rand(#frames["topperSets"])
 	-- key spaws at random X location and lock spawns after it
-	local keySpawnX = rand(30, width - 30)
+	local keySpawnX = rand(80, width - 10)
 	local lockSpawnX = keySpawnX - 10
 	local keyColor = rand(4)
 	local keyFound = false
-	local lastPillerX = 1
+	local lastPillarX = 1
+	local lastChasmX = 1
 	for y = 1, height do
 		table.insert(tiles, {})
 		for x = 1, width do
@@ -23,14 +24,15 @@ function LevelMaker.generate(width, height)
 			for y = 7, height do
 				tiles[y][x] = Tile(x, y, TILE_ID_GROUND, y == 7, tileSet, topperSet)
 			end
-		elseif rand(7) == 1 and x ~= lockSpawnX and x~= keySpawnX and x > lastPillerX + 1 then
+		elseif rand(7) == 1 and x ~= lockSpawnX and x ~= keySpawnX and x > lastPillarX + 1 then
+			lastChasmX = x
 			for y = 1, height do
 				tiles[y][x] = Tile(x, y, TILE_ID_EMPTY, y == 7, tileSet, topperSet)
 			end
-		-- randomly spawn tall pillars with ladder at each side and make sure it doesn't overlap with existing pillars 
+		-- randomly spawn tall pillars with ladder at each side and make sure it doesn't overlap with existing pillars
 		-- make sure pillar doesn't overlap with lock block or key
-		elseif rand(25) == 1 and x > lastPillerX + 1 and x < width-2 and x ~= lockSpawnX and x ~= keySpawnX then
-			lastPillerX = x
+		elseif rand(25) == 1 and x > lastPillarX + 1 and x < width - 2 and x ~= lockSpawnX and x ~= keySpawnX then
+			lastPillarX = x
 			for nx = x - 1, x + 1 do
 				for y = (nx == x and 3 or 7), height do
 					tiles[y][nx] = Tile(nx, y, TILE_ID_GROUND, y == (nx == x and 3 or 7), tileSet, topperSet)
@@ -43,8 +45,8 @@ function LevelMaker.generate(width, height)
 			for y = 7, height do
 				tiles[y][x] = Tile(x, y, TILE_ID_GROUND, y == 7, tileSet, topperSet)
 			end
-			if rand(8) == 1 and x > lastPillerX + 1 then
-				lastPillerX = x
+			if rand(8) == 1 and x > lastChasmX + 1 and x > lastPillarX + 1 then
+				lastPillarX = x
 				blockHeight = 2
 				if rand(8) == 1 then
 					objects[#objects + 1] = GameObject({
@@ -83,6 +85,7 @@ function LevelMaker.generate(width, height)
 					collidable = true,
 					consumable = true,
 					onConsume = function(player, obj)
+						sounds["pickup"]:play()
 						keyFound = true
 					end,
 				})
@@ -103,6 +106,7 @@ function LevelMaker.generate(width, height)
 					solid = true,
 					onCollide = function(object)
 						if keyFound then
+							sounds["powerup-reveal"]:play()
 							for i, obj in ipairs(objects) do
 								if obj == lock then
 									table.remove(objects, i)
@@ -110,11 +114,13 @@ function LevelMaker.generate(width, height)
 								end
 							end
 							spawnGoalPost(objects, width - 1)
+						else
+							sounds["empty-block"]:play()
 						end
 					end,
 				})
 				table.insert(objects, lock)
-			elseif rand(10) == 1 and x > lastPillerX + 1 then
+			elseif rand(10) == 1 and x > lastChasmX + 1 then
 				objects[#objects + 1] = GameObject({
 					texture = "jump-blocks",
 					x = (x - 1) * TILE_SIZE,
@@ -139,12 +145,14 @@ function LevelMaker.generate(width, height)
 									consumable = true,
 									solid = false,
 									onConsume = function(player, object)
+										sounds["pickup"]:play()
 										player.score = player.score + GEM_SCORE
 									end,
 								})
 								timer.tween(0.1, {
 									[gem] = { y = (blockHeight - 2) * TILE_SIZE },
 								})
+								sounds["powerup-reveal"]:play()
 								objects[#objects + 1] = gem
 							-- lower chance to spawn powerup
 							elseif rand(8) == 1 then
@@ -160,6 +168,7 @@ function LevelMaker.generate(width, height)
 									solid = false,
 									onConsume = function(player, object)
 										-- set invincible to true and set it back to false after 10 seconds (effect doesn't stack)
+										sounds["pickup"]:play()
 										if not player.invincible then
 											player.invincible = true
 											timer.after(10, function()
@@ -171,10 +180,12 @@ function LevelMaker.generate(width, height)
 								timer.tween(0.1, {
 									[powerup] = { y = (blockHeight - 2) * TILE_SIZE },
 								})
+								sounds["powerup-reveal"]:play()
 								objects[#objects + 1] = powerup
 							end
 							obj.hit = true
 						end
+						sounds["empty-block"]:play()
 					end,
 				})
 			end
@@ -213,6 +224,7 @@ end
 -- callback used by the flag consumables, touching the flag sends the player to next level
 function touchFlag(player, obj)
 	if player.x + player.width >= player.map.width then
+		sounds["pickup"]:play()
 		-- pass player score and 10% increased width from current level to next level
 		gsm:change("play", { width = math.floor(player.map.width * 1.1), score = player.score })
 	end
