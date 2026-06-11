@@ -104,7 +104,7 @@ function LevelMaker.generate(width, height)
 					end,
 				})
 				table.insert(objects, lock)
-			elseif rand(15) == 1 then
+			elseif rand(20) == 1 then
 				objects[#objects + 1] = GameObject({
 					texture = "jump-blocks",
 					x = (x - 1) * TILE_SIZE,
