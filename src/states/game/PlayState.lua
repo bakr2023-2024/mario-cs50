@@ -4,13 +4,19 @@ function PlayState:init()
 	self.timer = require("lib.knife.timer")
 	self.camX = 0
 	self.camY = 0
-	self.level = LevelMaker.generate(100, 10)
-	self.tileMap = self.level.tileMap
 	self.background = math.random(3)
 	self.backgroundX = 0
 	self.gravityOn = true
 	self.gravityAmount = 900
+end
+-- saving score and width 
+function PlayState:enter(params)
+	self.score = params.score
+	self.width = params.width
+	self.level = LevelMaker.generate(self.width, 10)
+	self.tileMap = self.level.tileMap
 	local startX = 0
+	-- ensure that the player spawns at a column that has a ground
 	for x = 1, 100 do
 		if self.tileMap.tiles[7][x].id == TILE_ID_GROUND then
 			startX = (x - 1) * 16
@@ -22,6 +28,7 @@ function PlayState:init()
 		y = 0,
 		width = 16,
 		height = 20,
+		score = self.score,
 		texture = "green-alien",
 		stateMachine = StateMachine({
 			["idle"] = function()

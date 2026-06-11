@@ -7,7 +7,7 @@ end
 
 function StartState:update(dt)
 	if love.keyboard.active["enter"] or love.keyboard.active["return"] then
-		gsm:change("play")
+		gsm:change("play", { score = 0, width = 100 })
 	end
 end
 
