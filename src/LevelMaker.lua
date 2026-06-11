@@ -24,7 +24,7 @@ function LevelMaker.generate(width, height)
 			for y = 7, height do
 				tiles[y][x] = Tile(x, y, TILE_ID_GROUND, y == 7, tileSet, topperSet)
 			end
-		elseif rand(7) == 1 and x ~= lockSpawnX and x ~= keySpawnX and x > lastPillarX + 1 then
+		elseif rand(7) == 1 and x ~= lockSpawnX and x ~= keySpawnX then
 			lastChasmX = x
 			for y = 1, height do
 				tiles[y][x] = Tile(x, y, TILE_ID_EMPTY, y == 7, tileSet, topperSet)
